@@ -1,12 +1,12 @@
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 
--- ✅ CFrame เป้าหมาย
+-- ✅ เป้าหมายเทเลพอร์ต
 local targetCFrame = CFrame.new(
     -2.87504387, -591.993408, -25.5160141, -0.747889876, 0, 0.663823009, 0, 1, 0, -0.663823009, 0, -0.747889876
 )
 
--- ✅ ฟังก์ชันรอให้ Character พร้อม
+-- ✅ รอ character
 local function waitForCharacter()
     if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then
         lp.CharacterAdded:Wait()
@@ -15,45 +15,40 @@ local function waitForCharacter()
     return lp.Character:FindFirstChild("HumanoidRootPart")
 end
 
--- ✅ ลูปเทเลพอร์ต ไม่หลุดแน่นอน
-while true do
-    local hrp = waitForCharacter()
-    hrp.CFrame = targetCFrame
-    wait(1) -- รอ 1 วินาทีแล้วเทเลพอร์ตซ้ำ (ปรับตามต้องการ)
-end
+-- ✅ ลูปเทเลพอร์ตใน background
+task.spawn(function()
+    while true do
+        local hrp = waitForCharacter()
+        hrp.CFrame = targetCFrame
+        wait(1)
+    end
+end)
 
-local player = game.Players.LocalPlayer  -- กำหนดผู้เล่นที่กำลังใช้งาน
-
--- ฟังก์ชันลบเครื่องมือออกจากผู้เล่น
-local function removeTools()
-    while true do  -- ทำงานใน loop ตลอดเวลา
-        local hasTools = false  -- ตัวแปรเช็คว่าใน Backpack มีเครื่องมือหรือไม่
-
-        -- เช็คว่าใน Backpack มีเครื่องมือหรือไม่
-        for _, tool in pairs(player.Backpack:GetChildren()) do
+-- ✅ ลูปลบเครื่องมือใน background
+task.spawn(function()
+    while true do
+        local hasTools = false
+        for _, tool in pairs(lp.Backpack:GetChildren()) do
             if tool:IsA("Tool") then
-                hasTools = true  -- ถ้ามีเครื่องมือ, ให้เปลี่ยนค่า hasTools เป็น true
-                break  -- ไม่ต้องเช็คต่อแล้ว
+                hasTools = true
+                break
             end
         end
 
-        -- ถ้ามีเครื่องมือใน Backpack ให้ลบออก
         if hasTools then
-            for _, tool in pairs(player.Backpack:GetChildren()) do
+            for _, tool in pairs(lp.Backpack:GetChildren()) do
                 if tool:IsA("Tool") then
-                    tool:Destroy()  -- ลบเครื่องมือออกจาก Backpack
-                    print("Tool removed: " .. tool.Name)  -- แสดงข้อความเมื่อมีเครื่องมือถูกลบ
+                    print("Tool removed: " .. tool.Name)
+                    tool:Destroy()
                 end
             end
         else
-            print("No tools found in Backpack.")  -- แจ้งว่าไม่มีเครื่องมือใน Backpack
+            print("No tools found in Backpack.")
         end
 
-        wait(1)  -- รอ 1 วินาที ก่อนที่จะเช็คใหม่
+        wait(1)
     end
-end
+end)
 
--- เรียกใช้ฟังก์ชัน
-removeTools()
-
+-- ✅ โหลดสคริปต์จากภายนอก (ระวังความปลอดภัย)
 loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/666b9548b0e322722491428b44de9541.lua"))()
