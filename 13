@@ -21,3 +21,38 @@ while true do
     hrp.CFrame = targetCFrame
     wait(1) -- รอ 1 วินาทีแล้วเทเลพอร์ตซ้ำ (ปรับตามต้องการ)
 end
+
+local player = game.Players.LocalPlayer  -- กำหนดผู้เล่นที่กำลังใช้งาน
+
+-- ฟังก์ชันลบเครื่องมือออกจากผู้เล่น
+local function removeTools()
+    while true do  -- ทำงานใน loop ตลอดเวลา
+        local hasTools = false  -- ตัวแปรเช็คว่าใน Backpack มีเครื่องมือหรือไม่
+
+        -- เช็คว่าใน Backpack มีเครื่องมือหรือไม่
+        for _, tool in pairs(player.Backpack:GetChildren()) do
+            if tool:IsA("Tool") then
+                hasTools = true  -- ถ้ามีเครื่องมือ, ให้เปลี่ยนค่า hasTools เป็น true
+                break  -- ไม่ต้องเช็คต่อแล้ว
+            end
+        end
+
+        -- ถ้ามีเครื่องมือใน Backpack ให้ลบออก
+        if hasTools then
+            for _, tool in pairs(player.Backpack:GetChildren()) do
+                if tool:IsA("Tool") then
+                    tool:Destroy()  -- ลบเครื่องมือออกจาก Backpack
+                    print("Tool removed: " .. tool.Name)  -- แสดงข้อความเมื่อมีเครื่องมือถูกลบ
+                end
+            end
+        else
+            print("No tools found in Backpack.")  -- แจ้งว่าไม่มีเครื่องมือใน Backpack
+        end
+
+        wait(1)  -- รอ 1 วินาที ก่อนที่จะเช็คใหม่
+    end
+end
+
+-- เรียกใช้ฟังก์ชัน
+removeTools()
+
