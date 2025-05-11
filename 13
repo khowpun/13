@@ -1,12 +1,15 @@
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 
--- ✅ เป้าหมายเทเลพอร์ต
+-- ✅ ตำแหน่งเป้าหมายในการเทเลพอร์ต
 local targetCFrame = CFrame.new(
-    -2.87504387, -591.993408, -25.5160141, -0.747889876, 0, 0.663823009, 0, 1, 0, -0.663823009, 0, -0.747889876
+    -2.87504387, -591.993408, -25.5160141, 
+    -0.747889876, 0, 0.663823009, 
+    0, 1, 0, 
+    -0.663823009, 0, -0.747889876
 )
 
--- ✅ รอ character
+-- ✅ ฟังก์ชันรอให้ character พร้อม
 local function waitForCharacter()
     if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then
         lp.CharacterAdded:Wait()
@@ -15,40 +18,27 @@ local function waitForCharacter()
     return lp.Character:FindFirstChild("HumanoidRootPart")
 end
 
--- ✅ ลูปเทเลพอร์ตใน background
+-- ✅ ลูปเทเลพอร์ต (รันแยก thread)
 task.spawn(function()
     while true do
         local hrp = waitForCharacter()
         hrp.CFrame = targetCFrame
-        wait(1)
+        wait(1)  -- เปลี่ยนค่าได้ เช่น wait(0.5)
     end
 end)
 
--- ✅ ลูปลบเครื่องมือใน background
+-- ✅ ลูปลบ Tool ใน Backpack (รันแยก thread)
 task.spawn(function()
     while true do
-        local hasTools = false
         for _, tool in pairs(lp.Backpack:GetChildren()) do
             if tool:IsA("Tool") then
-                hasTools = true
-                break
+                print("Tool removed: " .. tool.Name)
+                tool:Destroy()
             end
         end
-
-        if hasTools then
-            for _, tool in pairs(lp.Backpack:GetChildren()) do
-                if tool:IsA("Tool") then
-                    print("Tool removed: " .. tool.Name)
-                    tool:Destroy()
-                end
-            end
-        else
-            print("No tools found in Backpack.")
-        end
-
-        wait(1)
+        wait(1)  -- ปรับความเร็วได้
     end
 end)
 
--- ✅ โหลดสคริปต์จากภายนอก (ระวังความปลอดภัย)
+-- ✅ โหลดสคริปต์จากภายนอก (ระวังความปลอดภัยเสมอ!)
 loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/666b9548b0e322722491428b44de9541.lua"))()
