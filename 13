@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 
--- ✅ เป้าหมาย CFrame ที่จะเทเลพอร์ตไป
 local targetCFrame = CFrame.new(
     -2.87504387, -591.993408, -25.5160141, 
     -0.747889876, 0, 0.663823009, 
@@ -9,20 +8,29 @@ local targetCFrame = CFrame.new(
     -0.663823009, 0, -0.747889876
 )
 
--- ✅ รอให้ character พร้อมก่อนใช้งาน
-local function waitForCharacter()
-    if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then
-        lp.CharacterAdded:Wait()
-        repeat wait() until lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+local function getHumanoidRootPart()
+    local character = lp.Character or lp.CharacterAdded:Wait()
+
+    -- รอจนกว่าจะมี HumanoidRootPart จริง ๆ
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    while not hrp do
+        character = lp.Character or lp.CharacterAdded:Wait()
+        hrp = character:FindFirstChild("HumanoidRootPart")
+        task.wait(0.1)
     end
-    return lp.Character:FindFirstChild("HumanoidRootPart")
+
+    return hrp
 end
 
--- ✅ ลูปเทเลพอร์ตทุกวินาที
+-- ลูปเทเลพอร์ตทุกวินาที แม้ตัวละครถูกรีเซ็ต
 task.spawn(function()
     while true do
-        local hrp = waitForCharacter()
-        hrp.CFrame = targetCFrame
+        local success, result = pcall(getHumanoidRootPart)
+        if success and result then
+            pcall(function()
+                result.CFrame = targetCFrame
+            end)
+        end
         task.wait(1)
     end
 end)
